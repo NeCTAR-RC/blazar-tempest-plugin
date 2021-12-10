@@ -7,19 +7,25 @@ defaults:
     content-type: application/json
     X-Auth-Token: $ENVIRON['OS_TOKEN']
 
+vars:
+  - &compute_hypervisors $ENVIRON['COMPUTE_SERVICE']/v2.1/os-hypervisors
+  - &reservation_hosts $ENVIRON['RESERVATION_SERVICE']/v1/os-hosts
+  - &reservation_leases $ENVIRON['RESERVATION_SERVICE']/v1/leases
+  - &reservation_allocations $ENVIRON['RESERVATION_SERVICE']/v1/os-hosts/allocations
+
 tests:
 - name: get host name
-  GET: compute/v2.1/os-hypervisors
+  GET: *compute_hypervisors
   status: 200
 
 - name: post new host
-  POST: reservation/v1/os-hosts
+  POST: *reservation_hosts
   data:
       name: $HISTORY['get host name'].$RESPONSE['$.hypervisors[0].hypervisor_hostname']
   status: 201
 
 - name: post new lease lease1
-  POST: reservation/v1/leases
+  POST: *reservation_leases
   data:
     name: lease1
     start_date: "2050-01-01 10:00"
@@ -33,7 +39,7 @@ tests:
   status: 201
 
 - name: post new lease lease2
-  POST: reservation/v1/leases
+  POST: *reservation_leases
   data:
     name: lease2
     start_date: "2050-01-01 12:00"
@@ -47,25 +53,25 @@ tests:
   status: 201
 
 - name: list host allocations
-  GET: reservation/v1/os-hosts/allocations
+  GET: *reservation_allocations
   response_json_paths:
     $.allocations..reservations.`len`: 2
 
 - name: list host allocations with lease2
-  GET: reservation/v1/os-hosts/allocations
+  GET: *reservation_allocations
   query_parameters:
     lease_id: $HISTORY['post new lease lease2'].$RESPONSE['$.lease.id']
   response_json_paths:
     $.allocations.`len`: 1
 
 - name: delete lease2
-  DELETE: reservation/v1/leases/$HISTORY['post new lease lease2'].$RESPONSE['$.lease.id']
+  DELETE: $ENVIRON['RESERVATION_SERVICE']/v1/leases/$HISTORY['post new lease lease2'].$RESPONSE['$.lease.id']
   status: 204
 
 - name: delete lease1
-  DELETE: reservation/v1/leases/$HISTORY['post new lease lease1'].$RESPONSE['$.lease.id']
+  DELETE: $ENVIRON['RESERVATION_SERVICE']/v1/leases/$HISTORY['post new lease lease1'].$RESPONSE['$.lease.id']
   status: 204
 
 - name: delete host
-  DELETE: reservation/v1/os-hosts/$HISTORY['post new host'].$RESPONSE['$.host.id']
+  DELETE: $ENVIRON['RESERVATION_SERVICE']/v1/os-hosts/$HISTORY['post new host'].$RESPONSE['$.host.id']
   status: 204
