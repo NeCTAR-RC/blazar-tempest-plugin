@@ -147,6 +147,7 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
 
         # delete the lease, which should trigger termination of the instance
         self.reservation_client.delete_lease(lease['id'])
+        self.wait_for_lease_deletion(lease['id'])
         waiters.wait_for_server_termination(self.os_admin.servers_client,
                                             server1['id'])
 
@@ -179,6 +180,8 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
         self.assertTrue(lease['status'] == 'TERMINATED')
         self.assertTrue('deleted' in
                         next(iter(lease['reservations']))['status'])
+        self.reservation_client.delete_lease(lease['id'])
+        self.wait_for_lease_deletion(lease['id'])
 
     @decorators.attr(type='smoke')
     def test_update_instance_reservation(self):
@@ -219,3 +222,5 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
         self.assertTrue(lease['status'] == 'TERMINATED')
         self.assertTrue('deleted' in
                         next(iter(lease['reservations']))['status'])
+        self.reservation_client.delete_lease(lease['id'])
+        self.wait_for_lease_deletion(lease['id'])
