@@ -43,7 +43,7 @@ class ResourceReservationScenarioTest(manager.ScenarioTest):
                                     "required")
 
         cred_provider = cls._get_credentials_provider()
-        creds = cred_provider.get_credentials('admin')
+        creds = cred_provider.get_admin_creds()
         auth_prov = tempestclients.get_auth_provider(creds._credentials)
         cls.os_admin.resource_reservation_client = (
             clients.ResourceReservationV1Client(auth_prov,
