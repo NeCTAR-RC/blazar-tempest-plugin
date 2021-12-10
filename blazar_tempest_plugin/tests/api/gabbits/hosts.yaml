@@ -7,13 +7,17 @@ defaults:
     content-type: application/json
     X-Auth-Token: $ENVIRON['OS_TOKEN']
 
+vars:
+  - &compute_hypervisors $ENVIRON['COMPUTE_SERVICE']/v2.1/os-hypervisors
+  - &reservation_hosts $ENVIRON['RESERVATION_SERVICE']/v1/os-hosts
+
 tests:
 - name: get host name
-  GET: compute/v2.1/os-hypervisors
+  GET: *compute_hypervisors
   status: 200
 
 - name: post new host with too long extra capability
-  POST: reservation/v1/os-hosts
+  POST: *reservation_hosts
   data:
       name: $HISTORY['get host name'].$RESPONSE['$.hypervisors[0].hypervisor_hostname']
       extra_capability_key_should_be_shorter_than_64_ABCDEFGHIJKLMNOPQRSTUVWXYZ: "foo"
@@ -22,21 +26,21 @@ tests:
       - Extra capability key too long
 
 - name: post new host
-  POST: reservation/v1/os-hosts
+  POST: *reservation_hosts
   data:
       name: $HISTORY['get host name'].$RESPONSE['$.hypervisors[0].hypervisor_hostname']
   status: 201
 
 - name: get new host
-  GET: reservation/v1/os-hosts
+  GET: *reservation_hosts
   response_json_paths:
      $.hosts.`len`: 1
 
 - name: delete new host
-  DELETE: reservation/v1/os-hosts/$HISTORY['get new host'].$RESPONSE['$.hosts[0].id']
+  DELETE: $ENVIRON['RESERVATION_SERVICE']/v1/os-hosts/$HISTORY['get new host'].$RESPONSE['$.hosts[0].id']
   status: 204
 
 - name: get no host
-  GET: reservation/v1/os-hosts
+  GET: *reservation_hosts
   response_json_paths:
      $.hosts.`len`: 0

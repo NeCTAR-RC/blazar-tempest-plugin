@@ -7,9 +7,12 @@ defaults:
     content-type: application/json
     X-Auth-Token: $ENVIRON['OS_TOKEN']
 
+vars:
+    - &reservation_leases $ENVIRON['RESERVATION_SERVICE']/v1/leases
+
 tests:
 - name: post new lease with invalid time order
-  POST: reservation/v1/leases
+  POST: *reservation_leases
   data:
     name: my_lease_wrong_time_order
     start_date: "2050-11-13 13:13"
@@ -19,7 +22,7 @@ tests:
     - End date must be later than start date.
 
 - name: post new lease with bogus start time
-  POST: reservation/v1/leases
+  POST: *reservation_leases
   data:
     name: my_lease_wrong_time_order
     start_date: "Bogus-date 13:13"
@@ -29,7 +32,7 @@ tests:
     - "Bogus-date 13:13 is an invalid date. Required format: %Y-%m-%d %H:%M"
 
 - name: post new lease without end_date
-  POST: reservation/v1/leases
+  POST: *reservation_leases
   data:
     name: my_lease_end_date_missing
     start_date: "now"
@@ -38,7 +41,7 @@ tests:
     - Missing parameter end_date
 
 - name: post new lease
-  POST: reservation/v1/leases
+  POST: *reservation_leases
   data:
     name: my_lease
     start_date: "2050-12-26 12:00"
@@ -46,15 +49,15 @@ tests:
   status: 201
 
 - name: get new lease
-  GET: reservation/v1/leases
+  GET: *reservation_leases
   response_json_paths:
     $.leases.`len`: 1
 
 - name: delete new lease
-  DELETE: reservation/v1/leases/$HISTORY['get new lease'].$RESPONSE['$.leases[0].id']
+  DELETE: $ENVIRON['RESERVATION_SERVICE']/v1/leases/$HISTORY['get new lease'].$RESPONSE['$.leases[0].id']
   status: 204
 
 - name: get no lease
-  GET: reservation/v1/leases
+  GET: *reservation_leases
   response_json_paths:
     $.leases.`len`: 0
