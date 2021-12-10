@@ -71,6 +71,33 @@ class ResourceReservationScenarioTest(manager.ScenarioTest):
     def delete_lease(self, lease_id):
         return self.reservation_client.delete_lease(lease_id)
 
+    def wait_for_lease_deletion(self, lease_id):
+
+        def check_lease_deletion():
+            try:
+                lease = self.reservation_client.get_lease(lease_id)['lease']
+                if lease:
+                    lease_status = lease['status']
+                    if lease_status == 'ERROR':
+                        raise lib_exceptions.DeleteErrorException(
+                            "Lease %s failed to delete and is in ERROR status"
+                            % lease_id)
+                else:
+                    return True
+            except Exception as e:
+                LOG.debug("Unable to find lease with id %(lease_id)s. "
+                          "Exception: %(message)s",
+                          {'lease_id': lease_id, 'message': str(e)})
+                return True
+            return False
+
+        if not test_utils.call_until_true(
+            check_lease_deletion,
+            CONF.resource_reservation.lease_end_timeout,
+                CONF.resource_reservation.lease_interval):
+            message = ("Timed out waiting for lease to be deleted")
+            raise lib_exceptions.TimeoutException(message)
+
     def wait_for_lease_end(self, lease_id):
 
         def check_lease_end():
