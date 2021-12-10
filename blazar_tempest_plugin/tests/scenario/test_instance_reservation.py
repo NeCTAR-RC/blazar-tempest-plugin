@@ -70,7 +70,8 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'disk_gb': 10,
                 'amount': 1,
                 'affinity': False,
-                'resource_properties': '',
+                'resource_properties':
+                    CONF.resource_reservation.resource_properties,
                 }
             ]
         return body
@@ -92,8 +93,10 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'disk_gb': 10,
                 'amount': 1,
                 'affinity': False,
-                'resource_properties': '',
+                'resource_properties':
+                    CONF.resource_reservation.resource_properties,
                 }
+
             ]
         return body
 
