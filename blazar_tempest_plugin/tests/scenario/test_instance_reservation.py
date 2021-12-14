@@ -48,7 +48,6 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                     image=self.image_ref, flavor=self.flavor_ref
                 )
             )
-        self.host = self._add_host_once()
 
     def tearDown(self):
         super(TestInstanceReservationScenario, self).tearDown()
@@ -133,19 +132,6 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                                      **create_kwargs)
         waiters.wait_for_server_status(self.os_admin.servers_client,
                                        server2['id'], 'ERROR',
-                                       raise_on_error=False)
-
-        # create an instance without specifying a reservation, which is
-        # expected to fail
-        create_kwargs = {
-            'image_id': CONF.compute.image_ref,
-            'flavor': CONF.compute.flavor_ref,
-            }
-        server3 = self.create_server(clients=self.os_admin,
-                                     wait_until=None,
-                                     **create_kwargs)
-        waiters.wait_for_server_status(self.os_admin.servers_client,
-                                       server3['id'], 'ERROR',
                                        raise_on_error=False)
 
         # delete the lease, which should trigger termination of the instance
