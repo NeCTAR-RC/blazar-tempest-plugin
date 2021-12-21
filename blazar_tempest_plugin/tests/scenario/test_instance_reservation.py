@@ -14,6 +14,7 @@
 #    under the License.
 
 import datetime
+import json
 
 from oslo_log import log as logging
 from tempest.common import waiters
@@ -71,6 +72,8 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'affinity': False,
                 'resource_properties':
                     CONF.resource_reservation.resource_properties,
+                'extra_specs':
+                    json.loads(CONF.resource_reservation.extra_specs)
                 }
             ]
         return body
@@ -94,6 +97,8 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'affinity': False,
                 'resource_properties':
                     CONF.resource_reservation.resource_properties,
+                'extra_specs':
+                    json.loads(CONF.resource_reservation.extra_specs)
                 }
 
             ]
