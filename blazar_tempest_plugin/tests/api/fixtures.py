@@ -21,7 +21,7 @@ from tempest import test
 class AuthenticationFixture(fixture.GabbiFixture, test.BaseTestCase):
     def start_fixture(self):
         cred_provider = self._get_credentials_provider()
-        creds = cred_provider.get_admin_creds()
+        creds = cred_provider.get_primary_creds()
         auth_prov = tempestclients.get_auth_provider(creds._credentials)
 
         os.environ['OS_TOKEN'] = auth_prov.get_token()
