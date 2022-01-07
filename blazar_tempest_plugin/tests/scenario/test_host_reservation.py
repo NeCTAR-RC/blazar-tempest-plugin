@@ -189,14 +189,14 @@ class TestHostReservationScenario(rrs.ResourceReservationScenarioTest):
             'image_id': CONF.compute.image_ref,
             'flavor': CONF.compute.flavor_ref,
             }
-        server = self.create_server(clients=self.os_admin,
+        server = self.create_server(clients=self.os_primary,
                                     **create_kwargs)
         # ensure server is located on the requested host
         self.assertEqual(host['host'], server['OS-EXT-SRV-ATTR:host'])
 
         # delete the lease, which should trigger termination of the instance
         self.reservation_client.delete_lease(lease['id'])
-        waiters.wait_for_server_termination(self.os_admin.servers_client,
+        waiters.wait_for_server_termination(self.os_primary.servers_client,
                                             server['id'])
 
         # create an instance without reservation id, which is expected to fail
@@ -204,10 +204,10 @@ class TestHostReservationScenario(rrs.ResourceReservationScenarioTest):
             'image_id': CONF.compute.image_ref,
             'flavor': CONF.compute.flavor_ref,
             }
-        server = self.create_server(clients=self.os_admin,
+        server = self.create_server(clients=self.os_primary,
                                     wait_until=None,
                                     **create_kwargs)
-        waiters.wait_for_server_status(self.os_admin.servers_client,
+        waiters.wait_for_server_status(self.os_primary.servers_client,
                                        server['id'], 'ERROR',
                                        raise_on_error=False)
 
@@ -234,7 +234,7 @@ class TestHostReservationScenario(rrs.ResourceReservationScenarioTest):
             'image_id': CONF.compute.image_ref,
             'flavor': CONF.compute.flavor_ref,
             }
-        server = self.create_server(clients=self.os_admin,
+        server = self.create_server(clients=self.os_primary,
                                     **create_kwargs)
 
         # wait for lease end
@@ -242,7 +242,7 @@ class TestHostReservationScenario(rrs.ResourceReservationScenarioTest):
 
         # check if the lease has been correctly terminated and
         # the instance is removed
-        waiters.wait_for_server_termination(self.os_admin.servers_client,
+        waiters.wait_for_server_termination(self.os_primary.servers_client,
                                             server['id'])
 
         # check that the host aggregate was deleted
@@ -284,10 +284,10 @@ class TestHostReservationScenario(rrs.ResourceReservationScenarioTest):
             'image_id': CONF.compute.image_ref,
             'flavor': CONF.compute.flavor_ref,
             }
-        server = self.create_server(clients=self.os_admin,
+        server = self.create_server(clients=self.os_primary,
                                     wait_until=None,
                                     **create_kwargs)
-        waiters.wait_for_server_status(self.os_admin.servers_client,
+        waiters.wait_for_server_status(self.os_primary.servers_client,
                                        server['id'], 'ACTIVE')
 
         # wait enough time for the update API to succeed
@@ -303,7 +303,7 @@ class TestHostReservationScenario(rrs.ResourceReservationScenarioTest):
 
         # check if the lease has been correctly terminated and
         # the instance is removed
-        waiters.wait_for_server_termination(self.os_admin.servers_client,
+        waiters.wait_for_server_termination(self.os_primary.servers_client,
                                             server['id'])
 
         # check that the host aggregate was deleted

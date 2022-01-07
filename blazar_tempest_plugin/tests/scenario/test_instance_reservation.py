@@ -120,7 +120,7 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'group': reservation['server_group_id']
                 },
             }
-        server1 = self.create_server(clients=self.os_admin,
+        server1 = self.create_server(clients=self.os_primary,
                                      **create_kwargs)
 
         # create another instance within the reservation, which is expected to
@@ -132,17 +132,17 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'group': reservation['server_group_id']
                 },
             }
-        server2 = self.create_server(clients=self.os_admin,
+        server2 = self.create_server(clients=self.os_primary,
                                      wait_until=None,
                                      **create_kwargs)
-        waiters.wait_for_server_status(self.os_admin.servers_client,
+        waiters.wait_for_server_status(self.os_primary.servers_client,
                                        server2['id'], 'ERROR',
                                        raise_on_error=False)
 
         # delete the lease, which should trigger termination of the instance
         self.reservation_client.delete_lease(lease['id'])
         self.wait_for_lease_deletion(lease['id'])
-        waiters.wait_for_server_termination(self.os_admin.servers_client,
+        waiters.wait_for_server_termination(self.os_primary.servers_client,
                                             server1['id'])
 
     @decorators.attr(type='smoke')
@@ -160,13 +160,13 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'group': reservation['server_group_id']
                 },
             }
-        server1 = self.create_server(clients=self.os_admin,
+        server1 = self.create_server(clients=self.os_primary,
                                      **create_kwargs)
 
         # wait for lease end
         self.wait_for_lease_end(lease['id'])
 
-        waiters.wait_for_server_termination(self.os_admin.servers_client,
+        waiters.wait_for_server_termination(self.os_primary.servers_client,
                                             server1['id'])
 
         # check the lease status and reservation status
@@ -192,7 +192,7 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
                 'group': reservation['server_group_id']
                 },
             }
-        server = self.create_server(clients=self.os_admin,
+        server = self.create_server(clients=self.os_primary,
                                     **create_kwargs)
 
         # Updating the lease end_date to 1 minute from now to avoid a failure
@@ -204,7 +204,7 @@ class TestInstanceReservationScenario(rrs.ResourceReservationScenarioTest):
             }
         self.reservation_client.update_lease(lease['id'], body)
 
-        waiters.wait_for_server_termination(self.os_admin.servers_client,
+        waiters.wait_for_server_termination(self.os_primary.servers_client,
                                             server['id'])
 
         # There is a lag between the server termination and the lease status
