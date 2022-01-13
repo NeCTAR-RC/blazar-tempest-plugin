@@ -22,10 +22,10 @@ class ResourceReservationV1Client(rest_client.RestClient):
     """Client class for accessing the resource reservation API."""
     BLAZARCLIENT_VERSION = '1'
 
-    lease = '/leases'
-    lease_path = '/leases/%s'
-    host = '/os-hosts'
-    host_path = '/os-hosts/%s'
+    lease = '/v1/leases'
+    lease_path = '/v1/leases/%s'
+    host = '/v1/os-hosts'
+    host_path = '/v1/os-hosts/%s'
 
     def _response_helper(self, resp, body=None):
         if body:
