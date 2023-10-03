@@ -41,5 +41,14 @@ ResourceReservationGroup = [
                help="Time in seconds between lease status checks."),
     cfg.IntOpt('lease_end_timeout',
                default=300,
-               help="Timeout in seconds to wait for a lease to finish.")
+               help="Timeout in seconds to wait for a lease to finish."),
+    cfg.StrOpt('resource_properties',
+               default='',
+               help="The resource_properties to use for the resource"
+                    "reservation."
+                    "e.g. [\"=\",\"$availability_zone\", \"nova\"]"),
+    cfg.StrOpt('extra_specs',
+               default={},
+               help="The extra_specs to use for the resource reservation."
+                    "e.g. '{\"pci_passthrough:alias\":\"a1:1\"}'")
 ]
